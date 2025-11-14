@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Your existing variables */
+    --background: 240 10% 4%;
+    --foreground: 0 0% 95%;
+    --card: 240 6% 10%;
+    /* ... and the rest of your variables */
+
+    /* === NEW VARIABLES FOR THE BACKGROUND === */
+    --gradient-blue: 240 40% 12%; /* A subtle but clear dark blue */
+    --gradient-black: 240 10% 3%; /* A very dark, almost black with a hint of blue */
+  }
+
+  body {
+    /* Updated fallback color */
+    background-color: hsl(var(--gradient-black));
+
+    /* Updated gradient using the new variables */
+    background-image: radial-gradient(ellipse at top, hsl(var(--gradient-blue)), hsl(var(--gradient-black)));
+    
+    /* These properties remain the same */
+    min-height: 100vh;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: hsl(var(--foreground));
+  }
+}
