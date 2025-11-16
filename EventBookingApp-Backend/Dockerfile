@@ -16,6 +16,9 @@ COPY mvnw pom.xml ./
 # Copy the rest of the source code 
 COPY src ./src
 
+# --- FIX: Add execute permission to the Maven wrapper ---
+RUN chmod +x mvnw
+
 # Build the application, creating the executable JAR
 # We skip tests to make the build faster
 RUN ./mvnw package -DskipTests
