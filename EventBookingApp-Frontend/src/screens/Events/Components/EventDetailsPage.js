@@ -112,7 +112,7 @@ const EventDetailsPage = () => {
           {/* Left Column: Image */}
           <div className="lg:col-span-3">
             <img
-              src={`${API_URI}/images/${event.image}`}
+              src={`${event.image}`}
               alt={event.eventName}
               className="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg"
             />

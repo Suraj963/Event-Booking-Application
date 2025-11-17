@@ -50,7 +50,7 @@ const EventCard = ({ event, onDeleteClick, deleteStatus, role }) => {
     >
       <div className="relative">
         <img
-          src={`${API_URI}/images/${image}`}
+          src={`${image}`}
           alt={eventName}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {

@@ -84,7 +84,7 @@ const ImageUploadField = ({ id, label, imageData, onChange, error }) => {
   useEffect(() => {
     if (imageData) {
       if (typeof imageData === "string") {
-        setPreviewUrl(`${API_URI}/images/${imageData}`);
+        setPreviewUrl(`${imageData}`);
       } else if (imageData instanceof File) {
         const reader = new FileReader();
         reader.onloadend = () => {
