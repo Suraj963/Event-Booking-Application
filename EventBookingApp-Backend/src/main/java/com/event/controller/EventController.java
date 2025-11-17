@@ -40,6 +40,7 @@ public class EventController {
 	        @RequestParam("price") BigDecimal price,
 	        @RequestParam(value = "image", required = false) MultipartFile imageFile
 	) { 
+		System.out.println(imageFile);
 	    return eventService.addEvent(eventName, eventType, description, eventDateStr, eventTimeStr, location, totalSeats, availableSeats, price, imageFile);
 	}
 

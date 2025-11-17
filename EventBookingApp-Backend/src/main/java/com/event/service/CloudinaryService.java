@@ -30,12 +30,6 @@ public class CloudinaryService {
         }
     }
     
- // Inside: src/main/java/com.event.service/CloudinaryService.java
-
-    /**
-     * Deletes a file from Cloudinary using its full URL.
-     * @param imageUrl The full (secure_url) of the image to delete.
-     */
     public void deleteFile(String imageUrl) {
         try {
             // Extract the public_id from the URL.
@@ -52,13 +46,6 @@ public class CloudinaryService {
         }
     }
 
-    /**
-     * Extracts the public_id from a Cloudinary URL.
-     * Example: "https/res.cloudinary.com/cloud/image/upload/v123/folder/public_id.jpg"
-     * Becomes: "folder/public_id"
-     * @param imageUrl The full URL.
-     * @return The extracted public_id.
-     */
     private String extractPublicIdFromUrl(String imageUrl) {
         try {
             // Find the "upload/" part
