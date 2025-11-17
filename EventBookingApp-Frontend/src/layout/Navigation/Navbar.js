@@ -4,7 +4,6 @@ import {
   UserIcon,
   Bars3Icon,
   XMarkIcon,
-  EnvelopeIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { AuthContext } from "../../auth";
@@ -51,22 +50,24 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-sm border-b border-border/20 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        {/* --- CHANGE 1: Navbar height reduced to h-16 --- */}
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center space-x-3">
-              <span className="bg-primary p-2 rounded-lg">
-                <EnvelopeIcon className="h-6 w-6 text-primary-foreground" />
-              </span>
-              <span className="text-foreground text-2xl font-bold">
-                Eventify
-              </span>
+            <Link to="/" className="flex items-center">
+              {/* --- CHANGE 2: Logo height adjusted to h-10 --- */}
+              <img
+                src="/logo.png"
+                alt="Golden Occasions Logo"
+                className="h-14 w-auto" // Was h-12
+              />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            {/* --- CHANGE 3: Alignment changed to items-center --- */}
+            <div className="ml-10 flex items-center space-x-4"> {/* Was items-baseline */}
               <NavLink to="/" className={getNavLinkClass} end>
                 Home
               </NavLink>
@@ -129,7 +130,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu (No changes needed here, it's already responsive) */}
       {isOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
