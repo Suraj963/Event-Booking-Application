@@ -27,11 +27,11 @@ const GenerateTicketPdf = async (booking) => {
 
     // --- Main Ticket Body (Left Side) ---
 
-    // Header with Eventify brand
+    // Header with Golden Occasions brand
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(primaryColor);
-    doc.text("Eventify", margin, 15);
+    doc.text("Golden Occasions", margin, 15);
 
     // Event Title
     const eventTitleStartY = 25;
@@ -152,10 +152,10 @@ const GenerateTicketPdf = async (booking) => {
       margin,
       docHeight - 8
     );
-    doc.text("All rights reserved by Eventify © 2025.", margin, docHeight - 5);
+    doc.text("All rights reserved by Golden Occasions © 2025.", margin, docHeight - 5);
 
     // --- Download the PDF ---
-    const fileName = `Ticket-Eventify-${booking.id.substring(0, 8)}.pdf`;
+    const fileName = `Golden-Occasions-${booking.id.substring(0, 8)}.pdf`;
     doc.save(fileName);
   } catch (err) {
     console.error("Error generating PDF ticket:", err);
