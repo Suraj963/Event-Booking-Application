@@ -89,7 +89,7 @@ const Home = () => {
       {/* === Header Section === */}
       <header className="mb-12">
         <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-4">
-          Welcome to <span className="text-primary">Eventify</span>
+          Welcome to <span className="text-primary">Golden Occasions</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
           Book Your Tickets Easily – Discover amazing events, connect with
