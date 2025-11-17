@@ -83,14 +83,14 @@ const EventDetailsPage = () => {
       key: "rzp_test_1DP5mmOlF5G5ag", // Dummy test key
       amount: event.price * seatCount * 100, // Amount in rupees
       currency: "INR",
-      name: "Eventify",
+      name: "Golden Occasions",
       description: `Booking for ${event.eventName} (x${seatCount} seats)`,
       handler: (response) => {
         bookEvent(response.razorpay_payment_id);
       },
       prefill: {
-        name: "Eventify",
-        email: "eventify@example.com",
+        name: "Golden Occasions",
+        email: "surajgm6042@gmail.com",
         contact: "9999999999",
       },
       theme: { color: "#160935ff" },
