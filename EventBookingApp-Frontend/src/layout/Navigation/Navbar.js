@@ -50,24 +50,27 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-sm border-b border-border/20 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* --- CHANGE 1: Navbar height reduced to h-16 --- */}
+        {/* Navbar height is h-16 */}
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+          {/* Logo and Text */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              {/* --- CHANGE 2: Logo height adjusted to h-10 --- */}
               <img
                 src="/logo.png"
                 alt="Golden Occasions Logo"
-                className="h-14 w-auto" // Was h-12
+                className="h-14 w-auto" // Set to h-14 as in your code
               />
+              {/* Added "Golden Occasions" text */}
+              <span className="ml-3 text-xl font-bold text-foreground">
+                Golden Occasions
+              </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            {/* --- CHANGE 3: Alignment changed to items-center --- */}
-            <div className="ml-10 flex items-center space-x-4"> {/* Was items-baseline */}
+            {/* Alignment is items-center */}
+            <div className="ml-10 flex items-center space-x-4">
               <NavLink to="/" className={getNavLinkClass} end>
                 Home
               </NavLink>
@@ -130,7 +133,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu (No changes needed here, it's already responsive) */}
+      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">

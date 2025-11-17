@@ -117,10 +117,15 @@ const SignupPage = () => {
             to="/"
             className="flex items-center justify-center space-x-3 mb-4"
           >
-            <span className="bg-primary p-2.5 rounded-lg">
-              <SparklesIcon className="h-7 w-7 text-primary-foreground" />
+            <img
+              src="/logo.png"
+              alt="Golden Occasions Logo"
+              className="h-14 w-auto" // Set to h-14 as in your code
+            />
+            {/* Added whitespace-nowrap */}
+            <span className="text-foreground text-2xl font-bold whitespace-nowrap">
+              Golden Occasions
             </span>
-            <span className="text-foreground text-3xl font-bold">Eventify</span>
           </Link>
           <h1 className="text-2xl font-bold text-foreground">
             Create an Account

@@ -106,7 +106,7 @@ const LoginPage = () => {
     }
   };
 
-  return (
+ return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-card/50 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-border/20">
         {/* Header */}
@@ -115,10 +115,15 @@ const LoginPage = () => {
             to="/"
             className="flex items-center justify-center space-x-3 mb-4"
           >
-            <span className="bg-primary p-2.5 rounded-lg">
-              <SparklesIcon className="h-7 w-7 text-primary-foreground" />
+            <img
+              src="/logo.png"
+              alt="Golden Occasions Logo"
+              className="h-14 w-auto" // Set to h-14 as in your code
+            />
+            {/* Added whitespace-nowrap */}
+            <span className="text-foreground text-2xl font-bold whitespace-nowrap">
+              Golden Occasions
             </span>
-            <span className="text-foreground text-3xl font-bold">Eventify</span>
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Welcome Back!</h1>
           <p className="text-muted-foreground mt-1">
