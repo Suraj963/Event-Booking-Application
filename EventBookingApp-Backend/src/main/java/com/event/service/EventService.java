@@ -36,8 +36,12 @@ public class EventService {
 	@Autowired
 	private UserRepo userRepo;
 	
-	@Value("${app.upload.dir}")
-	private String uploadDir;
+	@Autowired
+    private CloudinaryService cloudinaryService;
+	
+	// This is no longer needed for file uploads
+	// @Value("${app.upload.dir}")
+	// private String uploadDir;
 
 	public ApiResponse<EventEntity> addEvent(
 	        String eventName,
@@ -71,26 +75,20 @@ public class EventService {
 	    event.setAvailableSeats(availableSeats);
 	    event.setPrice(price);
 
+	    // --- UPDATED IMAGE HANDLING ---
 	    try {
 	        if (imageFile != null && !imageFile.isEmpty()) {
-	            String originalFilename = imageFile.getOriginalFilename();
-	            String extension = "";
-	            if (originalFilename != null && originalFilename.contains(".")) {
-	                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-	            }
+                // 1. Upload the file to Cloudinary
+	            String imageUrl = cloudinaryService.uploadFile(imageFile);
 
-	            String imageName = eventName.replaceAll("\\s+", "_") + "_" + System.currentTimeMillis() + extension;
-
-	            // Save to disk
-	            Path path = Paths.get(uploadDir, imageName);
-	            Files.createDirectories(path.getParent()); // ensures folder exists
-	            Files.write(path, imageFile.getBytes());
-
-	            event.setImage(imageName);
+                // 2. Save the returned URL to the event entity
+	            event.setImage(imageUrl);
 	        }
-	    } catch (IOException e) {
-	        throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error while saving event image", e.getMessage());
+	    } catch (Exception e) {
+            // Catch any exception from the Cloudinary upload
+	        throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error while uploading event image", e.getMessage());
 	    }
+	    // --- END OF UPDATE ---
 
 	    // Save event to DB
 	    EventEntity saved = eventRepo.save(event);
@@ -101,7 +99,8 @@ public class EventService {
 	            "Event added successfully"
 	    );
 	}
-
+	
+	
 	public ApiResponse<EventEntity> updateEvent(String id, String eventName, String eventType, String description, String eventDateStr,
 	        String eventTimeStr, String location, int totalSeats, int availableSeats, BigDecimal price,
 	        MultipartFile imageFile) {
@@ -138,44 +137,28 @@ public class EventService {
 	    entity.setAvailableSeats(availableSeats);
 	    entity.setPrice(price);
 
-	    // Handle image update conditionally
+	    // --- UPDATED IMAGE HANDLING ---
 	    try {
 	        if (imageFile != null && !imageFile.isEmpty()) {
 	            // NEW IMAGE UPLOADED - Process new image
 	            System.out.println("New image uploaded, processing...");
 	            
-	            // Delete old image file if it exists
-	            String oldImageName = entity.getImage(); 
-	            if (oldImageName != null && !oldImageName.isEmpty()) {
-	                Path oldImagePath = Paths.get(uploadDir, oldImageName);
-	                if (Files.exists(oldImagePath)) {
-	                    Files.delete(oldImagePath);
-	                    System.out.println("Deleted old image: " + oldImageName);
-	                }
-	            }
+	            // Note: We are not deleting the old image from Cloudinary here,
+	            // as that requires more complex logic to extract the public_id
+	            // from the URL and make a 'destroy' API call.
 
-	            // Save new image
-	            String originalFilename = imageFile.getOriginalFilename();
-	            String extension = "";
-	            if (originalFilename != null && originalFilename.contains(".")) {
-	                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-	            }
+	            // 1. Save new image to Cloudinary
+	            String newImageUrl = cloudinaryService.uploadFile(imageFile);
 
-	            String newImageName = eventName.replaceAll("\\s+", "_") + "_" + System.currentTimeMillis() + extension;
-
-	            // Save new image to disk
-	            Path path = Paths.get(uploadDir, newImageName);
-	            Files.createDirectories(path.getParent());
-	            Files.write(path, imageFile.getBytes());
-
-	            // Update entity with new image name
-	            entity.setImage(newImageName);
+	            // 2. Update entity with new image URL
+	            entity.setImage(newImageUrl);
 	            
 	        } 
 	        
-	    } catch (IOException e) {
+	    } catch (Exception e) { // Changed to catch any upload exception
 	        throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error while updating event image", e.getMessage());
 	    }
+        // --- END OF UPDATE ---
 
 	    // Save updated entity to DB
 	    EventEntity updatedEntity = eventRepo.save(entity);
@@ -186,7 +169,8 @@ public class EventService {
 	            "Event updated successfully"
 	    );
 	}
-
+	
+	
 	public ApiResponse<List<EventEntity>> getAllEvents(String searchTerm) {
 	    try {
 	        List<EventEntity> events; 
@@ -280,66 +264,68 @@ public class EventService {
 	    }
 	}
 
-	public ApiResponse<EventEntity> delete(String id) {
-	    // Input validation
-	    if (id == null || id.trim().isEmpty()) {
-	        throw new ApiException(HttpStatus.BAD_REQUEST.value(), "Event ID cannot be null or empty");
-	    }
-	    
-	    System.out.println("Attempting to delete event with ID: " + id);
-	    
-	    try {
-	        // Find existing entity first
-	        Optional<EventEntity> optionalEntity = eventRepo.findById(id);
-	        
-	        if (!optionalEntity.isPresent()) {
-	            throw new ApiException(HttpStatus.NOT_FOUND.value(), "Event not found with ID: " + id);
-	        }
-	        
-	        EventEntity eventToDelete = optionalEntity.get();
-	        System.out.println("Found event to delete: " + eventToDelete.getEventName());
-	        
-	        // Delete associated image file if exists
-	        String imageName = eventToDelete.getImage();
-	        if (imageName != null && !imageName.isEmpty()) {
-	            try {
-	                Path imagePath = Paths.get(uploadDir, imageName);
-	                if (Files.exists(imagePath)) {
-	                    Files.delete(imagePath);
-	                    System.out.println("Deleted image file: " + imageName);
-	                } else {
-	                    System.out.println("Image file not found on disk: " + imageName);
-	                }
-	            } catch (IOException e) {
-	                // Log error but don't fail the entire delete operation
-	                System.err.println("Failed to delete image file: " + imageName + " - " + e.getMessage());
-	                // Continue with database deletion even if file deletion fails
-	            }
-	        }
-	        
-	        // Delete entity from database
-	        eventRepo.delete(eventToDelete);
-	        System.out.println("Successfully deleted event from database: " + eventToDelete.getEventName());
-	        
-	        return new ApiResponse<>(
-	            HttpStatus.OK.value(),
-	            eventToDelete,  // Return the deleted entity info
-	            "Event deleted successfully"
-	        );
-	        
-	    } catch (ApiException e) {
-	        // Re-throw custom exceptions
-	        throw e;
-	    } catch (Exception e) {
-	        // Handle any unexpected errors
-	        System.err.println("Error deleting event: " + e.getMessage());
-	        throw new ApiException(
-	            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-	            "Failed to delete event",
-	            e.getMessage()
-	        );
-	    }
-	}
+
+	    // You can now DELETE the '@Value("${app.upload.dir}") private String uploadDir;' field
+	    // from your class, as it is no longer needed.
+
+		public ApiResponse<EventEntity> delete(String id) {
+		    // Input validation
+		    if (id == null || id.trim().isEmpty()) {
+		        throw new ApiException(HttpStatus.BAD_REQUEST.value(), "Event ID cannot be null or empty");
+		    }
+		    
+		    System.out.println("Attempting to delete event with ID: " + id);
+		    
+		    try {
+		        // Find existing entity first
+		        Optional<EventEntity> optionalEntity = eventRepo.findById(id);
+		        
+		        if (!optionalEntity.isPresent()) {
+		            throw new ApiException(HttpStatus.NOT_FOUND.value(), "Event not found with ID: " + id);
+		        }
+		        
+		        EventEntity eventToDelete = optionalEntity.get();
+		        System.out.println("Found event to delete: " + eventToDelete.getEventName());
+		        
+		        // --- UPDATED IMAGE HANDLING ---
+		        // Delete associated image from Cloudinary if it exists
+		        String imageUrl = eventToDelete.getImage();
+		        if (imageUrl != null && !imageUrl.isEmpty()) {
+		            // We wrap this in its own try/catch block because we want to
+		            // delete the database record even if the cloud deletion fails.
+		            try {
+		                cloudinaryService.deleteFile(imageUrl);
+		                System.out.println("Successfully deleted image from Cloudinary: " + imageUrl);
+		            } catch (Exception e) {
+		                // Log error but don't fail the entire delete operation
+		                System.err.println("Failed to delete image from Cloudinary: " + imageUrl + " - " + e.getMessage());
+		            }
+		        }
+		        // --- END OF UPDATE ---
+		        
+		        // Delete entity from database
+		        eventRepo.delete(eventToDelete);
+		        System.out.println("Successfully deleted event from database: " + eventToDelete.getEventName());
+		        
+		        return new ApiResponse<>(
+		            HttpStatus.OK.value(),
+		            eventToDelete,  // Return the deleted entity info
+		            "Event deleted successfully"
+		        );
+		        
+		    } catch (ApiException e) {
+		        // Re-throw custom exceptions
+		        throw e;
+		    } catch (Exception e) {
+		        // Handle any unexpected errors
+		        System.err.println("Error deleting event: " + e.getMessage());
+		        throw new ApiException(
+		            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+		            "Failed to delete event",
+		            e.getMessage()
+		        );
+		    }
+		}
 	
 	public ApiResponse<Map<String, Object>> getStatistics() {
         try {
